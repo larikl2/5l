@@ -1,0 +1,77 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+@model WebApplication1.Models.SearchResultLine
+
+<input type="text" id="searchName" />
+<br />
+<table id="SearchResultTable" border="1">
+    <thead>
+        <tr>
+            <th scope="col">Mark</th>
+            <th scope="col">Name</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in ViewBag.SearchData)
+        {
+            <tr>
+                <td>@item.Mark</td>
+                <td>@item.Name</td>
+            </tr>
+        }
+    </tbody>
+</table>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<a href="/Home/GetWord">Get Word</a>
+<input type="text" id="delId" />
+<button id="delBtn">Удалить</button> <br />
+<p>Клиент  <input type="text" id="customerId" /> <br /><p />
+<p>Машина  <input type="text" id="carId" /><p />
+<button id="addBtn">Добавить запись</button>
+<br />
+<script>
+    var inputText = document.getElementById("searchName");
+    function changeOption() {
+        var txt = inputText.value;
+        $.ajax({
+            url: '/Home/Index?pattern=' + txt,
+            type: 'GET',
+            success: function (data) {
+                $("#SearchResultTable tbody tr").remove();
+                for (let i = 0; i < data.length; i++) {
+                    //alert(data[i].Name)
+                    $('#SearchResultTable > tbody:last-child').append('<tr><th scope ="row">'
+                        + data[i].Mark + '</td><td>'
+                        + data[i].Name + '</td>');
+                }
+            }
+        });
+    }
+    function delR() {
+        var indx = delId.value;
+        $.ajax({
+            url: '/Home/DeleteRow?delId=' + indx,
+            type: 'GET',
+            success: function () {
+                changeOption()
+            }
+        });
+    }
+    function addR() {
+        var clid = customerId.value;
+        var roid = carId.value;
+        $.ajax({
+            url: '/Home/AddRow?customerId=' + clid + '&carId=' + roid,
+            type: 'GET',
+            success: function () {
+                alert('f');
+                changeOption()
+            }
+        });
+    }
+    inputText.addEventListener("input", changeOption)
+    addBtn.addEventListener("click", addR)
+    delBtn.addEventListener("click", delR)
+    
+</script>
